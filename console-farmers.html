@@ -934,7 +934,7 @@ var G={"nodes": {"INST:figfcu": {"id": "INST:figfcu", "k": "inst", "kl": "Instit
 
 // --- stateful attestation loop ---
 (function(){
- var TOTAL=445, ratified=0;
+ var TOTAL=432, ratified=0;
  var toastEl;
  function toast(msg){ if(!toastEl){toastEl=document.createElement('div');toastEl.className='toast';document.body.appendChild(toastEl);} toastEl.textContent=msg;toastEl.classList.add('show');clearTimeout(toastEl._t);toastEl._t=setTimeout(function(){toastEl.classList.remove('show');},2600); }
  function update(){

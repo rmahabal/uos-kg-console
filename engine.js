@@ -154,6 +154,7 @@ function buildPage(template,d){
   s=s.split('JSON.parse(__x.responseText)').join('(window.__KG||{nodes:{},edges:[]})');
   s=s.split('(xhr.status>=200&&xhr.status<400)||xhr.status===0').join('true');
   s=s.split('(__x.status>=200&&__x.status<400)||__x.status===0').join('true');
+  s=s.split('var TOTAL=445').join('var TOTAL='+o.total);
   const tnode=(pv.trace&&pv.trace.node)||'PRC:share_savings';
   const prodId=(Object.values(g.nodes).find(n=>n.k==='prod')||{}).id||'';
   s=s.split("curId='PRC:share_savings'").join("curId='"+tnode+"'");
