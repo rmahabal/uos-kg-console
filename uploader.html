@@ -35,7 +35,7 @@
 <script src="engine.js"></script>
 <script>
 let TEMPLATE=null;
-fetch('_template_console.html').then(r=>r.text()).then(t=>TEMPLATE=t).catch(()=>{document.getElementById('err').textContent='Could not load template (serve over http).';});
+fetch('console_template.html').then(r=>r.text()).then(t=>TEMPLATE=t).catch(()=>{document.getElementById('err').textContent='Could not load template (serve over http).';});
 function render(obj){
   try{
     if(!TEMPLATE){document.getElementById('err').textContent='Template still loading — try again in a second.';return;}
