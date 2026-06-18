@@ -1197,4 +1197,9 @@ var G={"nodes": {"INST:iccu": {"id": "INST:iccu", "k": "inst", "kl": "Institutio
     function recalc(){var p=base.packs,r=base.ready,b=base.blocked;Object.keys(on).forEach(function(m){if(on[m]){p+=IMP[m].packs;r+=IMP[m].agents;b-=IMP[m].agents;}});if(regK)regK.textContent=p;if(regHint)regHint.textContent=p+' of 25 packs loaded';if(readyK)readyK.textContent=r;if(blkK)blkK.textContent=Math.max(0,b);}
     $all('.lrow',sv).forEach(function(row){var lt=row.querySelector('.lt'),tg=row.querySelector('.toggle');if(!lt||!tg)return;var nm=lt.textContent.trim(),key=null;Object.keys(IMP).forEach(function(k){if(nm.indexOf(k)>=0)key=k;});if(!key)return;tg.style.cursor='pointer';tg.addEventListener('click',function(){var nowOn=tg.classList.contains('off');tg.classList.toggle('off',!nowOn);on[key]=nowOn;recalc();var im=IMP[key];toast(key+(nowOn?' loaded':' unloaded')+' — '+(nowOn?'+':'−')+im.packs+' reg pack'+(im.packs>1?'s':'')+' ('+im.pk+'); +objects '+im.objs+'; '+(nowOn?'unblocks':'re-blocks')+' ~'+im.agents+' agents');});});
   }
-  function init(){try{wireBtns();}catch(e){}try{wireExtra();}catch(e){}try{overview();}catch(e){}try{provenance();}catch(e){}try{gaps();}catch(e){}try{matrix();}catch(e){}try{descriptors();}catch(e){}try{ingest();}catch(e){}try{drif
+  function init(){try{wireBtns();}catch(e){}try{wireExtra();}catch(e){}try{overview();}catch(e){}try{provenance();}catch(e){}try{gaps();}catch(e){}try{matrix();}catch(e){}try{descriptors();}catch(e){}try{ingest();}catch(e){}try{drift();}catch(e){}try{composition();}catch(e){}try{signoffRoles();}catch(e){}try{freshness();}catch(e){}try{modules();}catch(e){}}
+  if(document.readyState!=='loading')init();else document.addEventListener('DOMContentLoaded',init);
+})();
+</script>
+</body>
+</html>
