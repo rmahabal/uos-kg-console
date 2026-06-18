@@ -155,6 +155,13 @@ function buildPage(template,d){
   s=s.split('(xhr.status>=200&&xhr.status<400)||xhr.status===0').join('true');
   s=s.split('(__x.status>=200&&__x.status<400)||__x.status===0').join('true');
   s=s.split('var TOTAL=445').join('var TOTAL='+o.total);
+  // sign-off queue KPIs (static CCU literals -> per-CU)
+  const ready=o.total-o.gaps;
+  s=rep1(s,'id="kpi-awaiting">445</div>','id="kpi-awaiting">'+o.total+'</div>');
+  s=rep1(s,'<div class="lab">Your queue</div><div class="val">68</div>','<div class="lab">Your queue</div><div class="val">'+o.gaps+'</div>');
+  s=rep1(s,'id="bulk-attest">Bulk attest DEP pack (124)','id="bulk-attest">Bulk attest ready set ('+ready+')');
+  s=s.split("bulk.textContent='✓ DEP pack attested'").join("bulk.textContent='✓ ready set attested'");
+  s=s.split("ratified+=124; update(); toast('DEP pack attested · 124 nodes ratified · deposit agents promoted')").join("ratified+="+ready+"; update(); toast('"+ready+" nodes ratified · agents promoted')");
   const tnode=(pv.trace&&pv.trace.node)||'PRC:share_savings';
   const prodId=(Object.values(g.nodes).find(n=>n.k==='prod')||{}).id||'';
   s=s.split("curId='PRC:share_savings'").join("curId='"+tnode+"'");

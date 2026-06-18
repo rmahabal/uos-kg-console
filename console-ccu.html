@@ -647,13 +647,18 @@ html.dark .toast{background:var(--green);color:#06140e}
         </section>
         <section class="card sec" style="margin-top:16px">
           <div class="sec-h"><h3>Source register</h3><span class="hint">14 sources · last sync Jun 12</span></div>
-          <div class="row-list"><div class="lrow"><span class="fi-ic" style="background:var(--sky)">◴</span><div><div class="lt">Savings product page</div><div class="lm">document_faq · 50 nodes</div></div><span class="tag-ok">conf 0.90</span><span class="lm">Jun 12</span></div><div class="lrow"><span class="fi-ic" style="background:var(--teal)">▦</span><div><div class="lt">Consumer rate sheet, eff 3/2/2026</div><div class="lm">document_sop · 23 nodes</div></div><span class="tag-ok">conf 0.90</span><span class="lm">Jun 12</span></div><div class="lrow"><span class="fi-ic" style="background:var(--lime)">▦</span><div><div class="lt">Consumer fees &amp; charges, eff 11/5/2025</div><div class="lm">document_sop · 12 nodes</div></div><span class="tag-ok">conf 0.90</span><span class="lm">Jun 12</span></div><div class="lrow"><span class="fi-ic" style="background:var(--amber)">⚑</span><div><div class="lt">Share certificate page</div><div class="lm">document_faq · 7 nodes</div></div><span class="tag-ok">conf 0.90</span><span class="lm">Jun 12</span></div><div class="lrow"><span class="fi-ic" style="background:var(--green)">◆</span><div><div class="lt">CCU public website</div><div class="lm">document_faq · 6 nodes</div></div><span class="tag-ok">conf 0.90</span><span class="lm">Jun 12</span></div></div>
+          <div class="row-list">
+            <div class="lrow"><span class="fi-ic" style="background:var(--sky)">◴</span><div><div class="lt">ccu.com — public website</div><div class="lm">document_faq · feeds 9 node types</div></div><span class="tag-ok">conf 0.90</span><span class="lm">Jun 12</span></div>
+            <div class="lrow"><span class="fi-ic" style="background:var(--teal)">▦</span><div><div class="lt">Consumer fee schedule</div><div class="lm">document_sop · 13 nodes</div></div><span class="tag-ok">conf 0.85</span><span class="lm">Jun 12</span></div>
+            <div class="lrow"><span class="fi-ic" style="background:var(--lime)">▦</span><div><div class="lt">Truth-in-Savings disclosures</div><div class="lm">document_sop · 51 Disclosure nodes</div></div><span class="tag-ok">conf 0.85</span><span class="lm">Jun 12</span></div>
+            <div class="lrow"><span class="fi-ic" style="background:var(--amber)">⚑</span><div><div class="lt">Reg-pack seed library</div><div class="lm">reg_pack · 614 obligations wired 1:1</div></div><span class="tag-warn">conf 0.60</span><span class="lm">central</span></div>
+          </div>
         </section>
       </section>
 
       <!-- SIGN-OFF -->
       <section class="view" id="view-signoff">
-        <div class="page-h"><div><h1>Sign-off Queue</h1><p>Role-based attestation promotes nodes from draft into the live graph — only ratified nodes serve to agents</p></div><button class="cta" id="bulk-attest">Bulk attest DEP pack (124)</button></div>
+        <div class="page-h"><div><h1>Sign-off Queue</h1><p>Role-based attestation promotes nodes from draft into the live graph — only ratified nodes serve to agents</p></div><button class="cta" id="bulk-attest">Bulk attest ready set (377)</button></div>
         <div class="grid kpis" style="grid-template-columns:repeat(4,1fr)">
           <div class="card kpi"><div class="lab">Awaiting sign-off</div><div class="val warn" id="kpi-awaiting">445</div><div class="sub">default-unconfirmed</div></div>
           <div class="card kpi"><div class="lab">Ratified</div><div class="val" id="kpi-ratified">0</div><div class="sub">serving to agents</div></div>
@@ -955,8 +960,8 @@ var G={"nodes": {"INST:ccu": {"id": "INST:ccu", "k": "inst", "kl": "Institution"
    attest(+(row.dataset.n||1),row,row.dataset.unlock);
  });});
  var bulk=document.getElementById('bulk-attest'); if(bulk) bulk.addEventListener('click',function(){
-   if(bulk._done)return; bulk._done=true; bulk.textContent='✓ DEP pack attested'; bulk.style.opacity='.6';
-   ratified+=124; update(); toast('DEP pack attested · 124 nodes ratified · deposit agents promoted');
+   if(bulk._done)return; bulk._done=true; bulk.textContent='✓ ready set attested'; bulk.style.opacity='.6';
+   ratified+=377; update(); toast('377 nodes ratified · agents promoted');
  });
  update();
 })();
@@ -1149,14 +1154,14 @@ var G={"nodes": {"INST:ccu": {"id": "INST:ccu", "k": "inst", "kl": "Institution"
     if(sh){var h3=sh.querySelector('h3');if(h3)h3.textContent='Review queue · by accountable role';var hint=sh.querySelector('.hint');if(hint)hint.textContent='role-based sign-off · each owner ratifies its own facts';}
     $all('.qrow',sec).forEach(function(e){e.remove();});var nt0=sec.querySelector('.note');if(nt0)nt0.remove();
     function E(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-    var DOM=[['Compliance & Risk',['Compliance','Risk/Compliance','Compliance/Legal','Compliance/Risk','BSA/Compliance'],'var(--amber)'],['Product & Finance',['Product','Product/Finance','Finance'],'var(--green)'],['Marketing',['Marketing'],'#7c3aed'],['Ops / IT',['Ops/IT'],'var(--sky)']];
+    var DOM=[['Compliance & Risk',['Compliance','Risk/Compliance','Compliance/Legal','Compliance/Risk','BSA/Compliance','Compliance/BSA','Risk','Legal','BSA'],'var(--amber)'],['Product & Finance',['Product','Product/Finance','Finance','Finance/Product','Treasury'],'var(--green)'],['Marketing',['Marketing','Marketing/Compliance','Marketing/Product','Brand'],'#7c3aed'],['Ops / IT',['Ops/IT','Operations','Ops','IT','Operations/IT','Ops/Compliance','Digital','Technology','IT/Security'],'var(--sky)']];
     var KL={inst:'Institution',prod:'Product',feat:'Feature',seg:'Segment',chan:'Channel',rule:'Rule/Threshold',price:'Pricing',auth:'Authority',pol:'Policy',disc:'Disclosure',doc:'Doc Req',offer:'Offer',cons:'Consent',src:'Source'};
     var persona=document.createElement('div');persona.className='persona';if(sh)sh.appendChild(persona);
     var host=document.createElement('div');host.className='role-lanes';sec.appendChild(host);
     var xhr=new XMLHttpRequest();xhr.open('GET','__baked__.json?v=3',true);xhr.onload=function(){if(!(true))return;var d;try{d=(window.__KG||{nodes:{},edges:[]});}catch(e){return;}
       var N=d.nodes;
       var lanes=DOM.map(function(D){var items=[];Object.keys(N).forEach(function(id){var n=N[id];if(n.k==='src')return;if(D[1].indexOf(n.owner)>=0)items.push(n);});return {name:D[0],color:D[2],items:items,done:false};});
-      function updKpi(){var rat=lanes.reduce(function(a,L){return a+(L.done?L.items.length:0);},0);var kr=document.getElementById('kpi-ratified');var ka=document.getElementById('kpi-awaiting');if(kr)kr.textContent=rat;if(ka)ka.textContent=(445-rat);}
+      function updKpi(){var rat=lanes.reduce(function(a,L){return a+(L.done?L.items.length:0);},0);var kr=document.getElementById('kpi-ratified');var ka=document.getElementById('kpi-awaiting');if(kr)kr.textContent=rat;if(ka){if(ka._t0==null)ka._t0=(+ka.textContent||0);ka.textContent=(ka._t0-rat);}}
       function render(active){
         host.innerHTML=lanes.map(function(L,i){if(active!=null&&active!==i)return '';var sample=L.items.slice(0,4).map(function(n){return '<div class="rl-item"><span class="rl-dot" style="background:'+L.color+'"></span><div class="rl-it"><div class="rl-in">'+E(n.name)+'</div><div class="rl-im">'+(KL[n.k]||n.k)+' · '+E(n.owner)+'</div></div><span class="btn-sm rl-lin" data-id="'+n.id+'">Lineage</span></div>';}).join('');return '<div class="rl-lane'+(L.done?' done':'')+'"><div class="rl-head"><span class="rl-name"><span class="rl-dot" style="background:'+L.color+'"></span>'+L.name+'</span><span class="rl-ct">'+(L.done?'✓ ':'')+L.items.length+'</span></div><div class="rl-body">'+sample+(L.items.length>4?'<div class="rl-more">+'+(L.items.length-4)+' more in queue</div>':'')+'</div><button class="cta full rl-attest" data-i="'+i+'" style="margin-top:8px"'+(L.done?' disabled':'')+'>'+(L.done?'✓ '+L.items.length+' ratified':'Bulk attest '+L.items.length+' →')+'</button></div>';}).join('');
         host.querySelectorAll('.rl-attest').forEach(function(b){if(b.disabled)return;b.addEventListener('click',function(){lanes[+b.dataset.i].done=true;updKpi();render(active);});});
@@ -1192,9 +1197,4 @@ var G={"nodes": {"INST:ccu": {"id": "INST:ccu", "k": "inst", "kl": "Institution"
     function recalc(){var p=base.packs,r=base.ready,b=base.blocked;Object.keys(on).forEach(function(m){if(on[m]){p+=IMP[m].packs;r+=IMP[m].agents;b-=IMP[m].agents;}});if(regK)regK.textContent=p;if(regHint)regHint.textContent=p+' of 25 packs loaded';if(readyK)readyK.textContent=r;if(blkK)blkK.textContent=Math.max(0,b);}
     $all('.lrow',sv).forEach(function(row){var lt=row.querySelector('.lt'),tg=row.querySelector('.toggle');if(!lt||!tg)return;var nm=lt.textContent.trim(),key=null;Object.keys(IMP).forEach(function(k){if(nm.indexOf(k)>=0)key=k;});if(!key)return;tg.style.cursor='pointer';tg.addEventListener('click',function(){var nowOn=tg.classList.contains('off');tg.classList.toggle('off',!nowOn);on[key]=nowOn;recalc();var im=IMP[key];toast(key+(nowOn?' loaded':' unloaded')+' — '+(nowOn?'+':'−')+im.packs+' reg pack'+(im.packs>1?'s':'')+' ('+im.pk+'); +objects '+im.objs+'; '+(nowOn?'unblocks':'re-blocks')+' ~'+im.agents+' agents');});});
   }
-  function init(){try{wireBtns();}catch(e){}try{wireExtra();}catch(e){}try{overview();}catch(e){}try{provenance();}catch(e){}try{gaps();}catch(e){}try{matrix();}catch(e){}try{descriptors();}catch(e){}try{ingest();}catch(e){}try{drift();}catch(e){}try{composition();}catch(e){}try{signoffRoles();}catch(e){}try{freshness();}catch(e){}try{modules();}catch(e){}}
-  if(document.readyState!=='loading')init();else document.addEventListener('DOMContentLoaded',init);
-})();
-</script>
-</body>
-</html>
+  function init(){try{wireBtns();}catch(e){}try{wireExtra();}catch(e){}try{overview();}catch(e){}try{provenance();}catch(e){}try{gaps();}catch(e){}try{matrix();}catch(e){}try{descriptors();}catch(e){}try{ingest();}catch(e){}try{drif
