@@ -6,6 +6,15 @@ const FIELD={inst:'legal_name',prod:'features',feat:'type',seg:'definition_crite
 const COMP_ORDER=['Product','Feature','Channel','Segment','Customer','Account','RuleThreshold','Authority','Pricing','Policy','Disclosure','DocumentRequirement','Consent','OfferPromotion','Institution','Source'];
 const COMP_TLABEL={RuleThreshold:'Rule / Threshold',DocumentRequirement:'Document req.',OfferPromotion:'Offer / Promo',Source:'Source (doc/system)'};
 const GROUPS=[['Drive Growth',10,['Product','Pricing','OfferPromotion','Segment','Feature']],['Service & Support',10,['Channel','DocumentRequirement','Consent','Disclosure']],['Attain Operating Efficiency',13,['RuleThreshold','Authority','Source','Pricing']],['Manage Risk & Compliance',18,['Policy','Disclosure','Authority','RuleThreshold']]];
+const READY_BASE={'Drive Growth':0.25,'Service & Support':0.33,'Attain Operating Efficiency':0.10,'Manage Risk & Compliance':0.03};
+const BLOCK_BASE={'Drive Growth':0.25,'Service & Support':0.10,'Attain Operating Efficiency':0.65,'Manage Risk & Compliance':0.42};
+function _tilt(arch){const a=(arch||'').toLowerCase();
+  if(a.indexOf('lending')>=0||a.indexOf('commercial')>=0)return {'Drive Growth':[1.0,1.0],'Service & Support':[1.1,0.9],'Attain Operating Efficiency':[0.8,1.15],'Manage Risk & Compliance':[0.7,1.15]};
+  if(a.indexOf('full-service')>=0)return {'Drive Growth':[1.2,0.9],'Service & Support':[1.2,0.9],'Attain Operating Efficiency':[1.1,0.95],'Manage Risk & Compliance':[1.0,1.0]};
+  if(a.indexOf('single')>=0)return {'Drive Growth':[0.8,1.15],'Service & Support':[1.0,1.0],'Attain Operating Efficiency':[0.9,1.05],'Manage Risk & Compliance':[1.0,1.0]};
+  return null;}
+const _GEN_REASON={ready:'knowledge present · pending sign-off',partial:'partial knowledge · some at runtime',blocked:'required module or pack not loaded'};
+const _RANK={ready:2,partial:1,blocked:0};
 const MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 const cap=s=>s.split(/\s+/).filter(Boolean).map(w=>w.charAt(0).toUpperCase()+w.slice(1)).join(' ');
 const titleFromId=id=>cap(String(id).split(':').slice(1).join(':').replace(/_/g,' '));
@@ -35,11 +44,16 @@ function compute(d){
   let conf=0; for(const t in nodes)for(const n of nodes[t])if(n.state&&n.state!=='default_unconfirmed')conf++;
   const attested=total?Math.round(100*conf/total):0;
   let gaps=0; for(const t in nodes)for(const n of nodes[t])if(hasNF(n))gaps++;
+  const tilt=_tilt(d.archetype||'')||(function(){const o={};GROUPS.forEach(g=>o[g[0]]=[1,1]);return o;})();
   const groups=[]; let R=0,P=0,B=0;
   for(const [name,size,doms] of GROUPS){
-    let present=0,stub=0; doms.forEach(t=>{present+=(counts[t]||0);(nodes[t]||[]).forEach(n=>{if(hasNF(n))stub++;});});
-    const sf=present?(present-stub)/present:0;
-    let ready=Math.round(size*sf*0.30), blocked=present?Math.round(size*(1-sf)*0.62):size;
+    const dn=[]; doms.forEach(t=>(nodes[t]||[]).forEach(n=>dn.push(n))); const pres=dn.length||1;
+    const hi=dn.filter(n=>typeof n.confidence_score==='number'&&n.confidence_score>=0.80).length/pres;
+    const gp=dn.filter(hasNF).length/pres;
+    const cov=doms.filter(t=>(nodes[t]||[]).length>=3).length/doms.length;
+    const tr=tilt[name][0], tb=tilt[name][1];
+    let ready=Math.round(size*READY_BASE[name]*(1-0.5*gp)*(0.85+0.3*hi)*tr);
+    let blocked=Math.round(size*(BLOCK_BASE[name]*(1+0.5*gp)+(1-cov)*0.3)*tb);
     ready=Math.max(0,Math.min(size,ready)); blocked=Math.max(0,Math.min(size-ready,blocked));
     const partial=size-ready-blocked; groups.push([name,ready,partial,blocked]); R+=ready;P+=partial;B+=blocked;}
   return {counts,total,rel,oblig,regpacks,attested,gaps,groups,legend:[R,P,B]};
@@ -114,6 +128,27 @@ function bindCards(s,d,o,name,av){
   s=s.replace(/(Top gaps to close · NEEDS_FI<\/h3>[\s\S]*?<div>)[\s\S]*?(<\/div>\s*<\/section>)/,(m,a,b)=>a+gh+b);
   return s;
 }
+function rethread(s,groups){
+  const gmap={}; groups.forEach(g=>gmap[g[0]]=[g[1],g[2],g[3]]);
+  const re=/<div class="agroup"><div class="gh"><span class="gt">([^<]*)<\/span><span class="gc">([^<]*)<\/span><\/div><div class="alist">((?:<div class="a-item">[\s\S]*?<\/span><\/div>)+)<\/div><\/div>/g;
+  const aitem=/<div class="a-item"><span class="adot (\w+)"><\/span><div><div class="an">([\s\S]*?)<\/div><div class="ar">([\s\S]*?)<\/div><\/div><span class="as \w+">[\s\S]*?<\/span><\/div>/g;
+  return s.replace(re,function(m,gname,gcOld,alist){
+    if(!gmap[gname])return m;
+    const r=gmap[gname][0],p=gmap[gname][1],b=gmap[gname][2]; const agents=[]; let am;
+    aitem.lastIndex=0; while((am=aitem.exec(alist))!==null) agents.push([am[1],am[2],am[3]]);
+    const order=agents.map((a,i)=>i).sort((x,y)=>(_RANK[agents[y][0]]-_RANK[agents[x][0]])||(x-y));
+    const ns={}; order.forEach((idx,rank)=>{ns[idx]= rank<r?'ready':(rank<r+p?'partial':'blocked');});
+    let items=''; agents.forEach(function(a,i){const st=ns[i]; const reason=(st===a[0])?a[2]:_GEN_REASON[st];
+      items+='<div class="a-item"><span class="adot '+st+'"></span><div><div class="an">'+a[1]+'</div><div class="ar">'+reason+'</div></div><span class="as '+st+'">'+st.charAt(0).toUpperCase()+st.slice(1)+'</span></div>';});
+    return '<div class="agroup"><div class="gh"><span class="gt">'+gname+'</span><span class="gc">'+r+'R · '+p+'P · '+b+'B · '+(r+p+b)+' agents</span></div><div class="alist">'+items+'</div></div>';
+  });
+}
+function focusSentence(arch,acro){const a=(arch||'').toLowerCase();
+  if(a.indexOf('lending')>=0||a.indexOf('commercial')>=0)return acro+' is a lending- and commercial-focused institution, so credit and servicing agents reach further; pure back-office efficiency and parts of risk stay blocked until those systems load.';
+  if(a.indexOf('full-service')>=0)return acro+' is a full-service community institution, so front-office agents lead broadly; deep back-office and specialized risk agents stay blocked until those modules load.';
+  if(a.indexOf('single')>=0)return acro+' is a single-segment consumer-deposits CU, so a focused set of deposit &amp; service agents lead; lending, business and efficiency agents stay blocked until those modules load.';
+  return acro+' is a deposits-led consumer core, so front-office deposit &amp; service agents lead; lending, business and most efficiency agents stay blocked until those modules load.';
+}
 function buildPage(template,d){
   const g=convert(d),o=compute(d),tb=topbar(d),pv=provenance(d);
   let lines=template.split('\n'); const gi=lines.findIndex(l=>l.trim().indexOf('var G={')===0);
@@ -136,6 +171,12 @@ function buildPage(template,d){
     const re=new RegExp('(<span class="bg-name">'+esc(grp[0])+'</span><span class="bg-count">)[^<]*(</span></div><div class="sbar"><i class="r" style="width:)[^"]*("></i><i class="p" style="width:)[^"]*("></i><i class="b" style="width:)[^"]*(%?"></i>)');
     s=s.replace(re,(m,a,b2,c2,d2,e2)=>a+r+' ready · '+p+' partial · '+b+' blocked'+b2+wr+'%'+c2+wp+'%'+d2+(e2?wb:wb+'%')+e2);});
   const L=o.legend; s=s.replace(/Ready \(\d+\)/,'Ready ('+L[0]+')').replace(/Partial \(\d+\)/,'Partial ('+L[1]+')').replace(/Blocked \(\d+\)/,'Blocked ('+L[2]+')');
+  const _acroN=(tb.name.split(/\s+/).filter(w=>/[A-Za-z]/.test(w[0]||'')).map(w=>w[0]).join('').toUpperCase().slice(0,5))||'FI';
+  s=rep1(s,'<div class="lab">Agents ready</div><div class="val">6</div>','<div class="lab">Agents ready</div><div class="val">'+L[0]+'</div>');
+  s=rep1(s,'<div class="lab">Partial</div><div class="val warn">23</div>','<div class="lab">Partial</div><div class="val warn">'+L[1]+'</div>');
+  s=rep1(s,'<div class="lab">Blocked</div><div class="val">22</div>','<div class="lab">Blocked</div><div class="val">'+L[2]+'</div>');
+  s=rethread(s,o.groups);
+  s=rep1(s,'CCU is deposits-led consumer core, so front-office deposit &amp; service agents lead; lending, business and most efficiency agents are blocked until those modules load.',focusSentence(d.archetype||'',_acroN));
   const tr=pv.trace,pm=pv.meta;
   s=rep1(s,'<h3>Trace · Share Savings APY</h3><span class="hint">node PRC:share_savings</span>','<h3>Trace · '+E(tr.title)+'</h3><span class="hint">node '+E(tr.node)+'</span>');
   s=rep1(s,'<div class="ct">Source</div><div class="cv">Consumer Ratesheet</div><div class="cm">PDF · 03.02.26 · ccu.com</div>','<div class="ct">Source</div><div class="cv">'+E(tr.src_title)+'</div><div class="cm">'+E(tr.src_meta)+'</div>');
